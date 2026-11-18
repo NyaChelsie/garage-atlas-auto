@@ -1,0 +1,128 @@
+<!-- En-tete : titre et bouton de creation. -->
+<div class="mb-4 flex items-center justify-between">
+  <h1 class="text-2xl font-bold text-indigo-900">Véhicules</h1>
+  <a routerLink="/vehicules/nouveau"
+     class="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700">
+    + Nouveau véhicule
+  </a>
+</div>
+
+<!-- Barre de filtres : recherche, statut, proprietaire. -->
+<div class="mb-4 flex flex-wrap gap-3">
+  <input
+    #champ
+    type="search"
+    placeholder="Marque, modèle ou immatriculation"
+    (input)="rechercher(champ.value)"
+    class="w-full max-w-xs rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+  />
+
+  <!-- #choixStatut : nom donne a la liste pour lire sa valeur quand elle change. -->
+  <select #choixStatut (change)="filtrerStatut(choixStatut.value)"
+          class="rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none">
+    <option value="">Tous les statuts</option>
+    @for (s of statuts; track s.valeur) {
+      <option [value]="s.valeur">{{ s.libelle }}</option>
+    }
+  </select>
+
+  <select #choixClient (change)="filtrerClient(choixClient.value)"
+          class="rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none">
+    <option value="">Tous les propriétaires</option>
+    @for (c of clients(); track c.id) {
+      <option [value]="c.id">{{ c.prenom }} {{ c.nom }}</option>
+    }
+  </select>
+</div>
+
+<!-- Les trois etats : chargement, erreur serveur, liste vide. Sinon le tableau. -->
+@if (chargement()) {
+  <p class="text-gray-600">Chargement…</p>
+} @else if (erreur(); as message) {
+  <div class="rounded border border-red-300 bg-red-100 p-4 text-red-800">
+    <p class="font-semibold">{{ message }}</p>
+    <button type="button" (click)="charger()"
+            class="mt-2 rounded border border-red-800 px-3 py-1 font-semibold hover:bg-red-800 hover:text-white">
+      Réessayer
+    </button>
+  </div>
+} @else if (vehicules().length === 0) {
+  <p class="text-gray-600">Aucun véhicule trouvé.</p>
+} @else {
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse text-left text-sm">
+      <thead class="bg-indigo-50 text-indigo-900">
+        <tr>
+          <th class="border border-gray-200 px-3 py-2">Immatriculation</th>
+          <th class="border border-gray-200 px-3 py-2">Véhicule</th>
+          <th class="border border-gray-200 px-3 py-2">Propriétaire</th>
+          <th class="border border-gray-200 px-3 py-2">Statut</th>
+          <th class="border border-gray-200 px-3 py-2">Coût estimé</th>
+          <th class="border border-gray-200 px-3 py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (v of vehicules(); track v.id) {
+          <tr class="hover:bg-gray-50">
+            <td class="border border-gray-200 px-3 py-2 font-semibold">{{ v.immatriculation }}</td>
+            <td class="border border-gray-200 px-3 py-2">{{ v.marque }} {{ v.modele }} ({{ v.annee }})</td>
+            <!-- clientNom : envoye directement par l'API, pas de second appel. -->
+            <td class="border border-gray-200 px-3 py-2">{{ v.clientNom }}</td>
+            <td class="border border-gray-200 px-3 py-2">
+              <div class="flex flex-col items-start gap-1">
+                <app-badge [statut]="v.statut" />
+
+                <!-- Seuls les statuts AUTORISES depuis le statut actuel sont proposes.
+                     @let : on calcule la liste une fois, puis on s'en sert deux fois. -->
+                @let suivants = statutsProposes(v);
+                @if (suivants.length > 0) {
+                  <!-- #choix : nom donne a la liste pour lire sa valeur.
+                       Apres l'appel, choix.value = '' la remet sur "Changer le statut...".
+                       [disabled] : pas de double envoi pendant le changement. -->
+                  <select #choix
+                          (change)="changerStatut(v, choix.value); choix.value = ''"
+                          [disabled]="changementEnCours() === v.id"
+                          [attr.aria-label]="'Changer le statut de ' + v.immatriculation"
+                          class="rounded border border-gray-300 px-2 py-1 text-xs focus:border-indigo-600 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50">
+                    <option value="">Changer le statut…</option>
+                    @for (s of suivants; track s.valeur) {
+                      <option [value]="s.valeur">{{ s.libelle }}</option>
+                    }
+                  </select>
+                } @else {
+                  <!-- Terminus (Livre) : aucun choix a proposer. -->
+                  <span class="text-xs text-gray-500">Aucun changement possible</span>
+                }
+              </div>
+            </td>
+            <td class="border border-gray-200 px-3 py-2">{{ fcfa(v.coutEstime) }}</td>
+            <td class="border border-gray-200 px-3 py-2">
+              <div class="flex gap-2">
+                <!-- Voir : ouvre la fiche /vehicules/3 (page de l'etape 10). -->
+                <a [routerLink]="['/vehicules', v.id]"
+                   class="rounded border border-gray-500 px-2 py-1 font-semibold text-gray-700 hover:bg-gray-700 hover:text-white">
+                  Voir
+                </a>
+                <a [routerLink]="['/vehicules', v.id, 'modifier']"
+                   class="rounded border border-indigo-600 px-2 py-1 font-semibold text-indigo-600 hover:bg-indigo-600 hover:text-white">
+                  Modifier
+                </a>
+                <button type="button" (click)="supprimer(v)"
+                        class="rounded border border-red-700 px-2 py-1 font-semibold text-red-700 hover:bg-red-700 hover:text-white">
+                  Supprimer
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination
+    [page]="page()"
+    [totalPages]="totalPages()"
+    [totalElements]="totalElements()"
+    (changer)="changerPage($event)"
+  />
+}

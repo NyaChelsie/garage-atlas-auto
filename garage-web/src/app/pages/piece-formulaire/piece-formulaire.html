@@ -1,0 +1,106 @@
+<h1 class="mb-4 text-2xl font-bold text-indigo-900">
+  {{ modification ? 'Modifier la pièce' : 'Nouvelle pièce' }}
+</h1>
+
+@if (chargement()) {
+  <p class="text-gray-600">Chargement…</p>
+} @else {
+  <!-- Bandeau d'erreur general : erreurs qui ne concernent pas un champ precis. -->
+  @if (bandeau(); as message) {
+    <div class="mb-4 max-w-xl rounded border border-red-300 bg-red-100 p-3 font-semibold text-red-800" role="alert">
+      {{ message }}
+    </div>
+  }
+
+  <form [formGroup]="formulaire" (ngSubmit)="enregistrer()" novalidate class="max-w-xl space-y-4">
+
+    <div>
+      <label for="reference" class="block font-semibold">Référence</label>
+      <input id="reference" type="text" formControlName="reference" placeholder="PCE-0001"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('reference')" />
+      @if (erreur('reference'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="designation" class="block font-semibold">Désignation</label>
+      <input id="designation" type="text" formControlName="designation"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('designation')" />
+      @if (erreur('designation'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="categorie" class="block font-semibold">Catégorie</label>
+      <!-- La premiere option a la valeur '' : c'est l'etat "rien choisi", refuse par required. -->
+      <select id="categorie" formControlName="categorie"
+              class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+              [class.border-red-600]="erreur('categorie')">
+        <option value="">Choisir une catégorie</option>
+        @for (c of categories; track c.valeur) {
+          <option [value]="c.valeur">{{ c.libelle }}</option>
+        }
+      </select>
+      @if (erreur('categorie'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="fabricant" class="block font-semibold">Fabricant</label>
+      <input id="fabricant" type="text" formControlName="fabricant"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('fabricant')" />
+      @if (erreur('fabricant'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="prixUnitaire" class="block font-semibold">Prix unitaire (FCFA)</label>
+      <!-- type="number" : le clavier numerique s'affiche ; step="0.01" autorise les centimes. -->
+      <input id="prixUnitaire" type="number" step="0.01" min="0" formControlName="prixUnitaire"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('prixUnitaire')" />
+      @if (erreur('prixUnitaire'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="quantiteStock" class="block font-semibold">Quantité en stock</label>
+      <input id="quantiteStock" type="number" step="1" min="0" formControlName="quantiteStock"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100"
+             [class.border-red-600]="erreur('quantiteStock')" />
+      @if (modification) {
+        <!-- En modification, le champ est verrouille : le stock bouge par entrees et sorties. -->
+        <p class="mt-1 text-sm text-gray-600">
+          Le stock se modifie par une entrée ou une sortie de stock, pas depuis cette fiche.
+        </p>
+      }
+      @if (erreur('quantiteStock'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="seuilAlerte" class="block font-semibold">Seuil d'alerte</label>
+      <input id="seuilAlerte" type="number" step="1" min="0" formControlName="seuilAlerte"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('seuilAlerte')" />
+      <p class="mt-1 text-sm text-gray-600">La pièce passe « en alerte » quand le stock est inférieur ou égal à ce seuil.</p>
+      @if (erreur('seuilAlerte'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="dateAchat" class="block font-semibold">Date d'achat</label>
+      <input id="dateAchat" type="date" formControlName="dateAchat" [max]="aujourdhui"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('dateAchat')" />
+      @if (erreur('dateAchat'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div class="flex gap-3">
+      <button type="submit" [disabled]="envoiEnCours()"
+              class="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">
+        {{ envoiEnCours() ? 'Enregistrement…' : 'Enregistrer' }}
+      </button>
+      <a routerLink="/pieces"
+         class="rounded border border-gray-400 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-100">
+        Annuler
+      </a>
+    </div>
+  </form>
+}

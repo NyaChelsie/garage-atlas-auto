@@ -1,0 +1,30 @@
+<!-- @if : la zone n'existe dans la page que s'il y a un message.
+     "service.message()" ouvre la boite (signal) pour lire sa valeur ;
+     "as msg" donne un nom court a cette valeur, utilisable dans le bloc. -->
+@if (service.message(); as msg) {
+  <!-- Classes Tailwind :
+       fixed top-4 right-4 z-50 : flotte en haut a droite, au-dessus du contenu
+       flex items-center gap-3  : texte et bouton alignes sur une ligne
+       max-w-sm rounded-lg      : largeur maximale et coins arrondis
+       px-4 py-3 font-semibold shadow-lg : marges internes, gras, ombre
+       Les couleurs changent selon le type : vert pour un succes, rouge pour une erreur. -->
+  <div
+    role="alert"
+    class="fixed top-4 right-4 z-50 flex max-w-sm items-center gap-3 rounded-lg px-4 py-3 font-semibold shadow-lg"
+    [class.bg-green-100]="msg.type === 'succes'"
+    [class.text-green-800]="msg.type === 'succes'"
+    [class.bg-red-100]="msg.type === 'erreur'"
+    [class.text-red-800]="msg.type === 'erreur'"
+  >
+    <span>{{ msg.texte }}</span>
+    <!-- Bouton de fermeture : efface le message sans attendre les 5 secondes. -->
+    <button
+      type="button"
+      (click)="service.effacer()"
+      aria-label="Fermer le message"
+      class="cursor-pointer text-xl leading-none"
+    >
+      ×
+    </button>
+  </div>
+}

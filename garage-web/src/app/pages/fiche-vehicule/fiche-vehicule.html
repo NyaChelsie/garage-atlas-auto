@@ -1,0 +1,257 @@
+<!-- Lien de retour vers la liste. -->
+<a routerLink="/vehicules" class="mb-4 inline-block font-semibold text-indigo-700 hover:underline">
+  ← Retour aux véhicules
+</a>
+
+<!-- Les trois etats : chargement, erreur serveur (404 compris), puis la fiche. -->
+@if (chargement()) {
+  <p class="text-gray-600">Chargement…</p>
+} @else if (erreur(); as message) {
+  <div class="rounded border border-red-300 bg-red-100 p-4 text-red-800">
+    <p class="font-semibold">{{ message }}</p>
+  </div>
+} @else if (vehicule(); as v) {
+
+  <!-- ===== Bloc 1 : le vehicule et son proprietaire ===== -->
+  <section class="mb-6 rounded border border-gray-200 p-4">
+    <div class="mb-3 flex flex-wrap items-center gap-3">
+      <h1 class="text-2xl font-bold text-indigo-900">{{ v.immatriculation }}</h1>
+      <app-badge [statut]="v.statut" />
+    </div>
+
+    <dl class="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+      <div><dt class="inline font-semibold">Véhicule : </dt>
+           <dd class="inline">{{ v.marque }} {{ v.modele }} ({{ v.annee }})</dd></div>
+      <div><dt class="inline font-semibold">Carburant : </dt>
+           <dd class="inline">{{ v.carburant }}</dd></div>
+      <div><dt class="inline font-semibold">Kilométrage : </dt>
+           <dd class="inline">{{ v.kilometrage }} km</dd></div>
+      <div><dt class="inline font-semibold">Entré le : </dt>
+           <dd class="inline">{{ date(v.dateEntree) }}</dd></div>
+      <div><dt class="inline font-semibold">Coût estimé : </dt>
+           <dd class="inline">{{ fcfa(v.coutEstime) }}</dd></div>
+      <!-- Le proprietaire : nom envoye par l'API, lien vers sa fiche de modification. -->
+      <div><dt class="inline font-semibold">Propriétaire : </dt>
+           <dd class="inline">
+             <a [routerLink]="['/clients', v.clientId, 'modifier']"
+                class="font-semibold text-indigo-700 hover:underline">{{ v.clientNom }}</a>
+           </dd></div>
+      @if (v.panne) {
+        <div class="sm:col-span-2"><dt class="inline font-semibold">Panne : </dt>
+             <dd class="inline">{{ v.panne }}</dd></div>
+      }
+    </dl>
+  </section>
+
+  <!-- ===== Bloc 2 : l'historique des interventions ===== -->
+  <section>
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-xl font-bold text-indigo-900">Interventions ({{ interventions().length }})</h2>
+      <!-- Le serveur refuse une intervention sur un vehicule LIVRE : on ne propose pas le bouton. -->
+      @if (v.statut !== 'LIVRE') {
+        <button type="button" (click)="basculerFormulaire()"
+                class="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700">
+          {{ formulaireOuvert() ? 'Fermer' : '+ Nouvelle intervention' }}
+        </button>
+      }
+    </div>
+
+    @if (v.statut === 'LIVRE') {
+      <p class="mb-3 rounded bg-gray-100 p-3 text-sm text-gray-700">
+        Ce véhicule est livré : on ne peut plus ajouter d'intervention.
+      </p>
+    }
+
+    <!-- Formulaire de nouvelle intervention. -->
+    @if (formulaireOuvert()) {
+      <form [formGroup]="formIntervention" (ngSubmit)="creerIntervention()" novalidate
+            class="mb-6 grid gap-3 rounded border border-indigo-200 bg-indigo-50 p-4 sm:grid-cols-2">
+
+        <div>
+          <label for="type" class="block text-sm font-semibold">Type</label>
+          <select id="type" formControlName="type"
+                  class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none">
+            @for (t of types; track t.valeur) {
+              <option [value]="t.valeur">{{ t.libelle }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label for="mainOeuvre" class="block text-sm font-semibold">Main-d'œuvre (FCFA, facultatif)</label>
+          <input id="mainOeuvre" type="number" min="0" formControlName="mainOeuvre"
+                 class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+                 [class.border-red-600]="erreurChamp('mainOeuvre')" />
+          @if (erreurChamp('mainOeuvre'); as message) {
+            <p class="mt-1 text-sm text-red-700">{{ message }}</p>
+          }
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="description" class="block text-sm font-semibold">Description</label>
+          <textarea id="description" rows="2" formControlName="description"
+                    class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+                    [class.border-red-600]="erreurChamp('description')"></textarea>
+          @if (erreurChamp('description'); as message) {
+            <p class="mt-1 text-sm text-red-700">{{ message }}</p>
+          }
+        </div>
+
+        <div>
+          <label for="dateDebut" class="block text-sm font-semibold">Date de début</label>
+          <!-- [max] : le calendrier lui-meme refuse une date future. -->
+          <input id="dateDebut" type="date" [max]="aujourdhui" formControlName="dateDebut"
+                 class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+                 [class.border-red-600]="erreurChamp('dateDebut')" />
+          @if (erreurChamp('dateDebut'); as message) {
+            <p class="mt-1 text-sm text-red-700">{{ message }}</p>
+          }
+        </div>
+
+        <div>
+          <label for="dateFin" class="block text-sm font-semibold">Date de fin (facultative)</label>
+          <input id="dateFin" type="date" formControlName="dateFin"
+                 class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+                 [class.border-red-600]="erreurFin()" />
+          @if (erreurFin(); as message) {
+            <p class="mt-1 text-sm text-red-700">{{ message }}</p>
+          }
+        </div>
+
+        <div class="flex items-center gap-3 sm:col-span-2">
+          <button type="submit" [disabled]="envoiIntervention()"
+                  class="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">
+            {{ envoiIntervention() ? 'Envoi…' : 'Enregistrer' }}
+          </button>
+          @if (erreurIntervention(); as message) {
+            <p class="font-semibold text-red-700" role="alert">{{ message }}</p>
+          }
+        </div>
+      </form>
+    }
+
+    <!-- La liste des interventions. -->
+    @if (interventions().length === 0) {
+      <p class="text-gray-600">Aucune intervention pour ce véhicule.</p>
+    }
+
+    @for (i of interventions(); track i.id) {
+      <article class="mb-4 rounded border border-gray-200 p-4">
+        <div class="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h3 class="font-bold text-indigo-900">{{ libelleType(i.type) }}</h3>
+            <p class="text-sm text-gray-600">
+              Du {{ date(i.dateDebut) }}
+              @if (i.dateFin) {
+                au {{ date(i.dateFin) }}
+              } @else {
+                · en cours
+              }
+            </p>
+          </div>
+          <!-- Le total vient du serveur : main-d'oeuvre + somme des sous-totaux. -->
+          <p class="text-lg font-bold">Total : {{ fcfa(i.total) }}</p>
+        </div>
+
+        <p class="mt-2">{{ i.description }}</p>
+        <p class="text-sm text-gray-700">Main-d'œuvre : {{ fcfa(i.mainOeuvre ?? 0) }}</p>
+
+        <!-- Les lignes : la "facture" de l'intervention. -->
+        @if (i.lignes.length === 0) {
+          <p class="mt-3 text-sm text-gray-500">Aucune pièce utilisée.</p>
+        } @else {
+          <div class="mt-3 overflow-x-auto">
+            <table class="w-full border-collapse text-left text-sm">
+              <thead class="bg-indigo-50 text-indigo-900">
+                <tr>
+                  <th class="border border-gray-200 px-3 py-1">Pièce</th>
+                  <th class="border border-gray-200 px-3 py-1">Qté</th>
+                  <th class="border border-gray-200 px-3 py-1">Prix unitaire</th>
+                  <th class="border border-gray-200 px-3 py-1">Sous-total</th>
+                  <th class="border border-gray-200 px-3 py-1"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (l of i.lignes; track l.id) {
+                  <tr>
+                    <td class="border border-gray-200 px-3 py-1">
+                      <span class="font-semibold">{{ l.pieceReference }}</span> · {{ l.pieceDesignation }}
+                    </td>
+                    <td class="border border-gray-200 px-3 py-1">{{ l.quantite }}</td>
+                    <!-- Prix COPIE a l'ajout : il ne bouge pas si la piece change de prix. -->
+                    <td class="border border-gray-200 px-3 py-1">{{ fcfa(l.prixUnitaire) }}</td>
+                    <td class="border border-gray-200 px-3 py-1">{{ fcfa(l.sousTotal) }}</td>
+                    <td class="border border-gray-200 px-3 py-1">
+                      <button type="button" (click)="retirerLigne(i, l.id)"
+                              class="rounded border border-red-700 px-2 py-0.5 font-semibold text-red-700 hover:bg-red-700 hover:text-white">
+                        Retirer
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- Ajout d'une piece : bouton + panneau (un seul panneau ouvert a la fois). -->
+        @if (v.statut !== 'LIVRE') {
+          <button type="button" (click)="basculerLigne(i)"
+                  [attr.aria-expanded]="interventionOuverte() === i.id"
+                  class="mt-3 rounded border border-emerald-700 px-3 py-1 font-semibold text-emerald-700 hover:bg-emerald-700 hover:text-white">
+            + Ajouter une pièce
+          </button>
+        }
+
+        @if (interventionOuverte() === i.id) {
+          <form [formGroup]="formLigne" (ngSubmit)="ajouterLigne(i)" novalidate
+                class="mt-3 flex flex-wrap items-start gap-3 rounded bg-indigo-50 p-3">
+            <div>
+              <label [attr.for]="'piece-' + i.id" class="block text-sm font-semibold">Pièce</label>
+              <!-- [ngValue] : garde un NOMBRE (avec [value], on recevrait du texte). -->
+              <select [id]="'piece-' + i.id" formControlName="pieceId"
+                      class="rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none">
+                <option [ngValue]="null">Choisir une pièce…</option>
+                @for (p of piecesDisponibles(i); track p.id) {
+                  <!-- Le stock disponible est affiche dans le choix ; stock 0 = non selectionnable. -->
+                  <option [ngValue]="p.id" [disabled]="p.quantiteStock === 0">
+                    {{ p.reference }} · {{ p.designation }} (stock : {{ p.quantiteStock }})
+                  </option>
+                }
+              </select>
+              @if (formLigne.controls.pieceId.touched && formLigne.controls.pieceId.invalid) {
+                <p class="mt-1 text-sm text-red-700">Choisis une pièce</p>
+              }
+            </div>
+
+            <div>
+              <label [attr.for]="'qte-' + i.id" class="block text-sm font-semibold">Quantité</label>
+              <input [id]="'qte-' + i.id" type="number" min="1" step="1" formControlName="quantite"
+                     class="w-28 rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+                     [class.border-red-600]="erreurQuantite()" />
+              @if (erreurQuantite(); as message) {
+                <p class="mt-1 text-sm text-red-700">{{ message }}</p>
+              }
+            </div>
+
+            <div class="flex gap-2 self-end">
+              <button type="submit" [disabled]="envoiLigne()"
+                      class="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">
+                {{ envoiLigne() ? 'Envoi…' : 'Ajouter' }}
+              </button>
+              <button type="button" (click)="basculerLigne(i)"
+                      class="rounded border border-gray-400 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-100">
+                Annuler
+              </button>
+            </div>
+
+            <!-- Erreur du serveur (409 stock insuffisant...) : le panneau reste ouvert. -->
+            @if (erreurLigne(); as message) {
+              <p class="w-full font-semibold text-red-700" role="alert">{{ message }}</p>
+            }
+          </form>
+        }
+      </article>
+    }
+  </section>
+}

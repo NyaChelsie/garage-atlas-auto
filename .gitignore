@@ -1,0 +1,20 @@
+
+# Backend Spring Boot
+garage-api/target/
+garage-api/.idea/
+
+# Frontend Angular
+garage-web/node_modules/
+garage-web/dist/
+garage-web/.angular/
+garage-web/.git/
+
+# IDE et systeme
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Fichiers sensibles
+.env
+.env.*

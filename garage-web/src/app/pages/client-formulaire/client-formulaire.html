@@ -1,0 +1,84 @@
+<h1 class="mb-4 text-2xl font-bold text-indigo-900">
+  {{ modification ? 'Modifier le client' : 'Nouveau client' }}
+</h1>
+
+@if (chargement()) {
+  <p class="text-gray-600">Chargement…</p>
+} @else {
+  <!-- Bandeau d'erreur general : erreurs qui ne concernent pas un champ precis. -->
+  @if (bandeau(); as message) {
+    <div class="mb-4 max-w-xl rounded border border-red-300 bg-red-100 p-3 font-semibold text-red-800" role="alert">
+      {{ message }}
+    </div>
+  }
+
+  <!-- [formGroup] : relie le <form> au formulaire du fichier .ts.
+       (ngSubmit) : appele a la validation. "novalidate" : on laisse Angular gerer
+       les controles, pas les bulles du navigateur. -->
+  <form [formGroup]="formulaire" (ngSubmit)="enregistrer()" novalidate class="max-w-xl space-y-4">
+
+    <div>
+      <label for="nom" class="block font-semibold">Nom</label>
+      <!-- formControlName : relie ce champ au controle "nom" du formulaire.
+           [class.border-red-600] : bordure rouge quand un message d'erreur est affiche. -->
+      <input id="nom" type="text" formControlName="nom"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('nom')" />
+      @if (erreur('nom'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="prenom" class="block font-semibold">Prénom</label>
+      <input id="prenom" type="text" formControlName="prenom"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('prenom')" />
+      @if (erreur('prenom'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="telephone" class="block font-semibold">Téléphone</label>
+      <input id="telephone" type="text" inputmode="numeric" formControlName="telephone"
+             placeholder="6XXXXXXXX"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('telephone')" />
+      @if (erreur('telephone'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="email" class="block font-semibold">Email <span class="font-normal text-gray-500">(facultatif)</span></label>
+      <input id="email" type="email" formControlName="email"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('email')" />
+      @if (erreur('email'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="ville" class="block font-semibold">Ville <span class="font-normal text-gray-500">(facultative)</span></label>
+      <input id="ville" type="text" formControlName="ville"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('ville')" />
+      @if (erreur('ville'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div>
+      <label for="dateInscription" class="block font-semibold">Date d'inscription</label>
+      <!-- [max] : le calendrier du navigateur refuse deja les dates futures. -->
+      <input id="dateInscription" type="date" formControlName="dateInscription" [max]="aujourdhui"
+             class="w-full rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+             [class.border-red-600]="erreur('dateInscription')" />
+      @if (erreur('dateInscription'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
+    </div>
+
+    <div class="flex gap-3">
+      <!-- [disabled] : pas de double clic pendant l'envoi. -->
+      <button type="submit" [disabled]="envoiEnCours()"
+              class="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">
+        {{ envoiEnCours() ? 'Enregistrement…' : 'Enregistrer' }}
+      </button>
+      <a routerLink="/clients"
+         class="rounded border border-gray-400 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-100">
+        Annuler
+      </a>
+    </div>
+  </form>
+}

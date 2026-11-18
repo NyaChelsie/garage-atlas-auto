@@ -1,0 +1,85 @@
+<!-- En-tete : titre et bouton de creation. -->
+<div class="mb-4 flex items-center justify-between">
+  <h1 class="text-2xl font-bold text-indigo-900">Clients</h1>
+  <a routerLink="/clients/nouveau"
+     class="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700">
+    + Nouveau client
+  </a>
+</div>
+
+<!-- Recherche : #champ est un nom donne a l'element, pour lire sa valeur sans "any".
+     (input) se declenche a chaque frappe ; la pause de 300 ms est geree dans clients.ts. -->
+<input
+  #champ
+  type="search"
+  placeholder="Rechercher par nom, prénom ou téléphone"
+  (input)="rechercher(champ.value)"
+  class="mb-4 w-full max-w-md rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
+/>
+
+<!-- Les trois etats exiges par le sujet : chargement, erreur serveur, liste vide.
+     Sinon on affiche le tableau. -->
+@if (chargement()) {
+  <p class="text-gray-600">Chargement…</p>
+} @else if (erreur(); as message) {
+  <div class="rounded border border-red-300 bg-red-100 p-4 text-red-800">
+    <p class="font-semibold">{{ message }}</p>
+    <button type="button" (click)="charger()"
+            class="mt-2 rounded border border-red-800 px-3 py-1 font-semibold hover:bg-red-800 hover:text-white">
+      Réessayer
+    </button>
+  </div>
+} @else if (clients().length === 0) {
+  <p class="text-gray-600">Aucun client trouvé.</p>
+} @else {
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse text-left text-sm">
+      <thead class="bg-indigo-50 text-indigo-900">
+        <tr>
+          <th class="border border-gray-200 px-3 py-2">Nom</th>
+          <th class="border border-gray-200 px-3 py-2">Prénom</th>
+          <th class="border border-gray-200 px-3 py-2">Téléphone</th>
+          <th class="border border-gray-200 px-3 py-2">Email</th>
+          <th class="border border-gray-200 px-3 py-2">Ville</th>
+          <th class="border border-gray-200 px-3 py-2">Inscription</th>
+          <th class="border border-gray-200 px-3 py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- @for : une ligne par client. "track client.id" : l'identifiant sert de repere. -->
+        @for (client of clients(); track client.id) {
+          <tr class="hover:bg-gray-50">
+            <td class="border border-gray-200 px-3 py-2">{{ client.nom }}</td>
+            <td class="border border-gray-200 px-3 py-2">{{ client.prenom }}</td>
+            <td class="border border-gray-200 px-3 py-2">{{ client.telephone }}</td>
+            <!-- ?? : l'email et la ville sont facultatifs (null) : on affiche un tiret. -->
+            <td class="border border-gray-200 px-3 py-2">{{ client.email ?? '—' }}</td>
+            <td class="border border-gray-200 px-3 py-2">{{ client.ville ?? '—' }}</td>
+            <td class="border border-gray-200 px-3 py-2">{{ client.dateInscription | date: 'dd/MM/yyyy' }}</td>
+            <td class="border border-gray-200 px-3 py-2">
+              <div class="flex gap-2">
+                <!-- [routerLink] avec un tableau : /clients/3/modifier -->
+                <a [routerLink]="['/clients', client.id, 'modifier']"
+                   class="rounded border border-indigo-600 px-2 py-1 font-semibold text-indigo-600 hover:bg-indigo-600 hover:text-white">
+                  Modifier
+                </a>
+                <button type="button" (click)="supprimer(client)"
+                        class="rounded border border-red-700 px-2 py-1 font-semibold text-red-700 hover:bg-red-700 hover:text-white">
+                  Supprimer
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- La pagination : on lui donne l'etat, elle nous prévient via (changer). -->
+  <app-pagination
+    [page]="page()"
+    [totalPages]="totalPages()"
+    [totalElements]="totalElements()"
+    (changer)="changerPage($event)"
+  />
+}

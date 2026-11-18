@@ -1,0 +1,29 @@
+<!-- On n'affiche la pagination que s'il y a au moins un element. -->
+@if (totalElements() > 0) {
+  <div class="mt-4 flex items-center justify-between text-sm">
+    <!-- page() + 1 : l'API compte a partir de 0, l'utilisateur a partir de 1. -->
+    <span class="text-gray-600">
+      Page {{ page() + 1 }} sur {{ totalPages() }} ({{ totalElements() }} éléments)
+    </span>
+
+    <div class="flex gap-2">
+      <!-- [disabled] : le bouton est grise quand l'action est impossible. -->
+      <button
+        type="button"
+        class="rounded border border-indigo-600 px-3 py-1 font-semibold text-indigo-600 hover:bg-indigo-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-indigo-600"
+        [disabled]="page() === 0"
+        (click)="changer.emit(page() - 1)"
+      >
+        Précédent
+      </button>
+      <button
+        type="button"
+        class="rounded border border-indigo-600 px-3 py-1 font-semibold text-indigo-600 hover:bg-indigo-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-indigo-600"
+        [disabled]="page() + 1 >= totalPages()"
+        (click)="changer.emit(page() + 1)"
+      >
+        Suivant
+      </button>
+    </div>
+  </div>
+}

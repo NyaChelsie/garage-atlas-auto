@@ -1,0 +1,27 @@
+<!-- <nav> : balise semantique pour un menu de navigation.
+     Classes Tailwind : fond indigo fonce, texte blanc, ombre legere. -->
+<nav class="bg-indigo-900 text-white shadow">
+  <div class="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
+    <span class="text-lg font-bold">Garage Atlas Auto</span>
+
+    <ul class="flex gap-2">
+      <!-- @for : repete le bloc pour chaque lien du tableau.
+           "track lien.chemin" : Angular identifie chaque element par son chemin. -->
+      @for (lien of liens; track lien.chemin) {
+        <li>
+          <!-- routerLink : l'adresse visee.
+               routerLinkActive : quand la route courante correspond, ces classes sont AJOUTEES
+               (fond indigo clair). Elles s'appliquent aussi aux sous-pages :
+               /vehicules/3/modifier garde "Vehicules" allume. -->
+          <a
+            [routerLink]="lien.chemin"
+            routerLinkActive="bg-indigo-600"
+            class="rounded px-3 py-2 text-sm font-semibold hover:bg-indigo-700"
+          >
+            {{ lien.libelle }}
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+</nav>
