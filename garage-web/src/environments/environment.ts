@@ -1,6 +1,6 @@
 // Fichier utilise pour la version "production" (ng build).
-// En vrai deploiement, on remplacerait cette adresse par celle du serveur reel.
+// L'adresse pointe vers le back deploye sur SnapDeploy.
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:8080/api',
+  apiUrl: 'https://garage-api-f77e9.containers.snapdeploy.app/api',
 };
