@@ -1,22 +1,41 @@
-<!-- <nav> : balise semantique pour un menu de navigation.
-     Classes Tailwind : fond indigo fonce, texte blanc, ombre legere. -->
 <nav class="bg-indigo-900 text-white shadow">
-  <div class="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
-    <span class="text-lg font-bold">Garage Atlas Auto</span>
+  <!-- Sur petit écran : le logo à gauche, le bouton menu à droite, les liens dessous.
+       À partir de "md" (écran moyen) : tout sur une ligne. -->
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between px-4 py-3 md:flex-nowrap md:justify-start md:gap-6">
+    <a routerLink="/" (click)="fermer()" class="text-lg font-bold">Garage Atlas Auto</a>
 
-    <ul class="flex gap-2">
-      <!-- @for : repete le bloc pour chaque lien du tableau.
-           "track lien.chemin" : Angular identifie chaque element par son chemin. -->
+    <!-- Bouton menu : visible seulement sur petit écran (md:hidden). -->
+    <button
+      type="button"
+      class="rounded p-2 hover:bg-indigo-700 md:hidden"
+      aria-label="Ouvrir ou fermer le menu"
+      [attr.aria-expanded]="ouvert()"
+      (click)="basculer()"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        @if (ouvert()) {
+          <path d="M6 6l12 12M18 6L6 18" />
+        } @else {
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        }
+      </svg>
+    </button>
+
+    <!-- Les liens : cachés sur petit écran tant que le menu est fermé,
+         toujours visibles à partir de "md". -->
+    <ul
+      class="w-full flex-col gap-1 pt-2 md:flex md:w-auto md:flex-row md:gap-2 md:pt-0"
+      [class.hidden]="!ouvert()"
+      [class.flex]="ouvert()"
+    >
       @for (lien of liens; track lien.chemin) {
         <li>
-          <!-- routerLink : l'adresse visee.
-               routerLinkActive : quand la route courante correspond, ces classes sont AJOUTEES
-               (fond indigo clair). Elles s'appliquent aussi aux sous-pages :
-               /vehicules/3/modifier garde "Vehicules" allume. -->
           <a
             [routerLink]="lien.chemin"
             routerLinkActive="bg-indigo-600"
-            class="rounded px-3 py-2 text-sm font-semibold hover:bg-indigo-700"
+            (click)="fermer()"
+            class="block rounded px-3 py-2 text-sm font-semibold hover:bg-indigo-700"
           >
             {{ lien.libelle }}
           </a>

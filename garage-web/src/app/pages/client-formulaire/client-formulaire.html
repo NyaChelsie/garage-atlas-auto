@@ -69,7 +69,7 @@
       @if (erreur('dateInscription'); as message) { <p class="mt-1 text-sm text-red-700">{{ message }}</p> }
     </div>
 
-    <div class="flex gap-3">
+    <div class="flex flex-wrap gap-3">
       <!-- [disabled] : pas de double clic pendant l'envoi. -->
       <button type="submit" [disabled]="envoiEnCours()"
               class="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">

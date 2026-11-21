@@ -1,3 +1,41 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+  --color-indigo-50: #f6f2e9;
+  --color-indigo-100: #efe6d3;
+  --color-indigo-200: #e2d3b4;
+  --color-indigo-300: #cfa57a;
+  --color-indigo-400: #b98556;
+  --color-indigo-500: #9c6c42;
+  --color-indigo-600: #8a5a33;
+  --color-indigo-700: #724a2a;
+  --color-indigo-800: #3d3934;
+  --color-indigo-900: #36322d;
+  --color-indigo-950: #26231f;
+
+    --color-gray-50: #faf7f0;
+  --color-gray-100: #f1ece1;
+  --color-gray-200: #e7e0d0;
+  --color-gray-300: #d6cdb9;
+  --color-gray-400: #a39b8b;
+  --color-gray-500: #7a7366;
+  --color-gray-600: #5f594e;
+  --color-gray-700: #48433a;
+  --color-gray-800: #36322d;
+  --color-gray-900: #26231f;
+
+  /* Même chose pour le bleu (statut « En réparation ») : il devient orange. */
+  --color-blue-50: #ffeadb;
+  --color-blue-100: #ffe1cf;
+  --color-blue-200: #ffcfb0;
+  --color-blue-600: #c2410c;
+  --color-blue-700: #b6400a;
+  --color-blue-800: #9a3a0a;
+}
+body {
+  background: #f6f2e9;
+  color: #2b2824;
+  overflow-x: clip;
+}

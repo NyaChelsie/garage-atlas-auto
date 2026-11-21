@@ -1,5 +1,4 @@
-<!-- En-tete : titre et bouton de creation. -->
-<div class="mb-4 flex items-center justify-between">
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
   <h1 class="text-2xl font-bold text-indigo-900">Clients</h1>
   <a routerLink="/clients/nouveau"
      class="rounded bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700">
@@ -7,8 +6,6 @@
   </a>
 </div>
 
-<!-- Recherche : #champ est un nom donne a l'element, pour lire sa valeur sans "any".
-     (input) se declenche a chaque frappe ; la pause de 300 ms est geree dans clients.ts. -->
 <input
   #champ
   type="search"
@@ -17,8 +14,6 @@
   class="mb-4 w-full max-w-md rounded border border-gray-300 px-3 py-2 focus:border-indigo-600 focus:outline-none"
 />
 
-<!-- Les trois etats exiges par le sujet : chargement, erreur serveur, liste vide.
-     Sinon on affiche le tableau. -->
 @if (chargement()) {
   <p class="text-gray-600">Chargement…</p>
 } @else if (erreur(); as message) {
@@ -32,7 +27,30 @@
 } @else if (clients().length === 0) {
   <p class="text-gray-600">Aucun client trouvé.</p>
 } @else {
-  <div class="overflow-x-auto">
+  <!-- TÉLÉPHONE : une carte par client (visible seulement sous la taille "md"). -->
+  <ul class="space-y-3 md:hidden">
+    @for (client of clients(); track client.id) {
+      <li class="rounded border border-gray-200 bg-white p-4 shadow-sm">
+        <p class="text-base font-semibold text-indigo-900">{{ client.prenom }} {{ client.nom }}</p>
+        <p class="mt-1 text-sm text-gray-700">{{ client.telephone }}</p>
+        <p class="text-sm text-gray-600">{{ client.email ?? '—' }} · {{ client.ville ?? '—' }}</p>
+        <p class="text-xs text-gray-500">Inscrit le {{ client.dateInscription | date: 'dd/MM/yyyy' }}</p>
+        <div class="mt-3 flex gap-2">
+          <a [routerLink]="['/clients', client.id, 'modifier']"
+             class="rounded border border-indigo-600 px-3 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-600 hover:text-white">
+            Modifier
+          </a>
+          <button type="button" (click)="supprimer(client)"
+                  class="rounded border border-red-700 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-700 hover:text-white">
+            Supprimer
+          </button>
+        </div>
+      </li>
+    }
+  </ul>
+
+  <!-- ORDINATEUR : le tableau complet (caché sous la taille "md"). -->
+  <div class="hidden overflow-x-auto md:block">
     <table class="w-full border-collapse text-left text-sm">
       <thead class="bg-indigo-50 text-indigo-900">
         <tr>
@@ -46,19 +64,16 @@
         </tr>
       </thead>
       <tbody>
-        <!-- @for : une ligne par client. "track client.id" : l'identifiant sert de repere. -->
         @for (client of clients(); track client.id) {
           <tr class="hover:bg-gray-50">
             <td class="border border-gray-200 px-3 py-2">{{ client.nom }}</td>
             <td class="border border-gray-200 px-3 py-2">{{ client.prenom }}</td>
             <td class="border border-gray-200 px-3 py-2">{{ client.telephone }}</td>
-            <!-- ?? : l'email et la ville sont facultatifs (null) : on affiche un tiret. -->
             <td class="border border-gray-200 px-3 py-2">{{ client.email ?? '—' }}</td>
             <td class="border border-gray-200 px-3 py-2">{{ client.ville ?? '—' }}</td>
             <td class="border border-gray-200 px-3 py-2">{{ client.dateInscription | date: 'dd/MM/yyyy' }}</td>
             <td class="border border-gray-200 px-3 py-2">
-              <div class="flex gap-2">
-                <!-- [routerLink] avec un tableau : /clients/3/modifier -->
+              <div class="flex flex-wrap gap-2">
                 <a [routerLink]="['/clients', client.id, 'modifier']"
                    class="rounded border border-indigo-600 px-2 py-1 font-semibold text-indigo-600 hover:bg-indigo-600 hover:text-white">
                   Modifier
@@ -75,7 +90,6 @@
     </table>
   </div>
 
-  <!-- La pagination : on lui donne l'etat, elle nous prévient via (changer). -->
   <app-pagination
     [page]="page()"
     [totalPages]="totalPages()"
