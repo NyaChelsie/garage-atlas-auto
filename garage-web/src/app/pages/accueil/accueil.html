@@ -1,0 +1,117 @@
+<header class="bg-[#1a1917]">
+  <div class="mx-auto flex h-[76px] max-w-[1160px] items-center justify-between px-5 sm:px-8">
+    <a routerLink="/" class="titre flex items-center gap-3 text-lg font-bold text-white sm:text-xl">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f5a524" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 16l1.5-5a2 2 0 0 1 1.9-1.4h7.2a2 2 0 0 1 1.9 1.4L19 16" />
+        <rect x="3" y="16" width="18" height="4" rx="1.5" />
+        <circle cx="7.5" cy="18" r=".6" />
+        <circle cx="16.5" cy="18" r=".6" />
+      </svg>
+      Garage Atlas Auto
+    </a>
+    <nav class="flex items-center gap-8 text-[15px] text-[#ebe6da]">
+      <button type="button" (click)="defiler('fonctions')" class="hidden md:block">Fonctionnalités</button>
+      <button type="button" (click)="defiler('suivi')" class="hidden md:block">Suivi des véhicules</button>
+      <button type="button" (click)="defiler('ouvrir')" class="hidden md:block">Démarrer</button>
+      <a routerLink="/tableau-de-bord" class="rounded-[10px] bg-[#f5a524] px-4 py-2.5 text-[15px] font-semibold text-[#1a1917] sm:px-5">
+        <span class="sm:hidden">Ouvrir</span><span class="hidden sm:inline">Ouvrir l’application</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<section class="relative overflow-hidden bg-[#1a1917] pb-14 pt-12 sm:pb-24 sm:pt-[72px]">
+  <img src="atelier.jpg" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover" style="object-position: 50% 55%" />
+  <div class="voile absolute inset-0" aria-hidden="true"></div>
+
+  <div class="relative z-10 mx-auto grid max-w-[1160px] items-center gap-10 px-5 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+    <div>
+      <span class="inline-block rounded-full bg-white/15 px-3.5 py-1.5 text-[13px] font-semibold text-white">Gestion d’atelier automobile</span>
+      <h1 class="titre mb-5 mt-[22px] text-[40px] font-bold leading-[1.05] tracking-[-1px] text-white sm:text-5xl lg:text-[60px]">Votre garage, enfin sous contrôle.</h1>
+      <p class="mb-[34px] max-w-[520px] text-[17px] leading-[1.6] text-[#ebe6da] sm:text-[19px]">Clients, véhicules, réparations et stock de pièces au même endroit. Sachez en un coup d’œil où en est chaque voiture et quelle pièce va manquer.</p>
+      <div class="flex flex-wrap gap-3.5">
+        <a routerLink="/tableau-de-bord" class="rounded-[10px] bg-[#f5a524] px-6 py-3.5 text-base font-semibold text-[#1a1917]">Ouvrir l’application</a>
+        <button type="button" (click)="defiler('fonctions')" class="rounded-[10px] border-[1.5px] border-white/40 px-6 py-3.5 text-base font-semibold text-white">Découvrir les fonctions</button>
+      </div>
+    </div>
+
+    <div class="rounded-[20px] bg-white p-5 shadow-[0_30px_60px_rgba(10,8,40,0.45)] sm:p-6">
+      <div class="mb-[18px] flex items-center justify-between">
+        <strong class="titre text-lg">Tableau de bord</strong>
+        <span class="rounded-full bg-[#e8f7ee] px-2.5 py-[3px] text-xs font-semibold text-[#157347]">En ligne</span>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="rounded-xl bg-[#f6f2e9] p-4"><div class="text-[13px] text-[#655f52]">Véhicules</div><div class="titre text-[30px] font-bold">8</div></div>
+        <div class="rounded-xl bg-[#ffeadb] p-4"><div class="text-[13px] text-[#9a3a0a]">En réparation</div><div class="titre text-[30px] font-bold text-[#b6400a]">2</div></div>
+        <div class="rounded-xl bg-[#fdecec] p-4"><div class="text-[13px] text-[#a12b2b]">Pièces en alerte</div><div class="titre text-[30px] font-bold text-[#b42318]">3</div></div>
+        <div class="rounded-xl bg-[#f6f2e9] p-4"><div class="text-[13px] text-[#655f52]">Chiffre d’affaires du mois</div><div class="titre mt-1.5 text-xl font-bold sm:text-2xl">92 000 FCFA</div></div>
+      </div>
+      <div class="mt-3.5 flex flex-col gap-2 text-sm">
+        <div class="flex items-center justify-between gap-2 rounded-[10px] border border-[#e7e0d0] px-3.5 py-2.5">
+          <span class="min-w-0 truncate">AB-123-CD · Toyota Corolla</span>
+          <span class="shrink-0 rounded-full bg-[#ffe1cf] px-2.5 py-[3px] text-xs font-semibold text-[#b6400a]">En réparation</span>
+        </div>
+        <div class="flex items-center justify-between gap-2 rounded-[10px] border border-[#e7e0d0] px-3.5 py-2.5">
+          <span class="min-w-0 truncate">GH-234-IJ · Peugeot 308</span>
+          <span class="shrink-0 rounded-full bg-[#e8f7ee] px-2.5 py-[3px] text-xs font-semibold text-[#157347]">Terminé</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="fonctions" class="pb-10 pt-14 sm:pt-[88px]">
+  <div class="mx-auto max-w-[1160px] px-5 sm:px-8">
+    <h2 class="titre mb-3 text-[28px] font-bold tracking-[-0.5px] sm:text-[38px]">Tout l’atelier dans une seule application</h2>
+    <p class="mb-10 max-w-[640px] text-base text-[#655f52] sm:text-lg">Les fonctions que les logiciels de garage professionnels proposent, pensées pour un atelier de quartier.</p>
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      @for (f of fonctions; track f.titre) {
+        <article class="rounded-2xl border border-[#e7e0d0] bg-white p-7">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="text-[#c2740a]">
+            @for (d of f.icone; track d) {
+              <path [attr.d]="d" />
+            }
+          </svg>
+          <h3 class="titre mb-2 mt-4 text-xl font-bold">{{ f.titre }}</h3>
+          <p class="text-[15px] leading-[1.55] text-[#655f52]">{{ f.texte }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<section id="suivi" class="pb-14 pt-14 sm:pb-[88px]">
+  <div class="mx-auto max-w-[1160px] px-5 sm:px-8">
+    <h2 class="titre mb-3 text-[28px] font-bold tracking-[-0.5px] sm:text-[38px]">Suivez chaque véhicule, du dépôt à la livraison</h2>
+    <p class="mb-9 max-w-[640px] text-base text-[#655f52] sm:text-lg">Un tableau visuel, comme dans les meilleurs logiciels d’atelier : une colonne par étape.</p>
+    <div class="grid gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
+      @for (c of colonnes; track c.titre) {
+        <div class="flex flex-col gap-2.5 rounded-[14px] border border-[#e7e0d0] bg-white p-3.5">
+          <span class="self-start rounded-full px-2.5 py-[3px] text-xs font-semibold" [class]="c.couleur">{{ c.titre }}</span>
+          @for (v of c.vehicules; track v.immat) {
+            <div class="rounded-[10px] bg-[#f6f2e9] p-3 text-sm leading-[1.4] text-[#1d1b17]"><strong>{{ v.immat }}</strong><br />{{ v.detail }}</div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section id="ouvrir" class="pb-14 sm:pb-[88px]">
+  <div class="mx-auto max-w-[1160px] px-5 sm:px-8">
+    <div class="flex flex-col gap-6 rounded-3xl bg-[#1a1917] p-8 sm:p-14 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 class="titre mb-2.5 text-2xl font-bold tracking-[-0.5px] text-white sm:text-4xl">Prêt à remettre de l’ordre dans votre atelier ?</h2>
+        <p class="text-base text-[#ebe6da] sm:text-lg">Ouvrez l’application et retrouvez vos clients, vos véhicules et vos pièces.</p>
+      </div>
+      <a routerLink="/tableau-de-bord" class="self-start whitespace-nowrap rounded-[10px] bg-[#f5a524] px-6 py-3.5 text-base font-semibold text-[#1a1917] md:self-auto">Ouvrir l’application</a>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-[#e7e0d0] py-7 text-sm text-[#655f52]">
+  <div class="mx-auto flex max-w-[1160px] flex-wrap justify-between gap-3 px-5 sm:px-8">
+    <span>Garage Atlas Auto · Application Angular et Spring Boot · Photo : Sten Rademaker, Unsplash</span>
+    <span>L’API peut mettre une minute à se réveiller après une période d’inactivité.</span>
+  </div>
+</footer>

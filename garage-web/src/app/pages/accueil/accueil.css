@@ -1,0 +1,28 @@
+/* La page d'accueil prend tout l'écran, au-dessus de la barre de l'application. */
+:host {
+  display: block;
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  z-index: 40;
+  background: #f6f2e9;
+  color: #1d1b17;
+  font-family: 'Inter', system-ui, sans-serif;
+  scroll-behavior: smooth;
+}
+
+.titre {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Voile sombre sur la photo, comme dans la maquette. */
+.voile {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.25) 40%, rgba(0, 0, 0, 0) 75%);
+}
+
+/* Sur téléphone, le texte prend toute la largeur : voile uniforme. */
+@media (max-width: 1023px) {
+  .voile {
+    background: rgba(0, 0, 0, 0.55);
+  }
+}

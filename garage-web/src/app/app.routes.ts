@@ -7,7 +7,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   // Adresse vide "/" : on redirige vers le tableau de bord.
   // pathMatch: 'full' = "seulement si l'adresse est EXACTEMENT vide".
-  { path: '', redirectTo: 'tableau-de-bord', pathMatch: 'full' },
+  { path: '', title: 'Accueil', pathMatch: 'full', loadComponent: () => import('./pages/accueil/accueil').then(m => m.Accueil) },
 
   {
     path: 'tableau-de-bord',
